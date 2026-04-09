@@ -1,14 +1,15 @@
 from django.contrib import admin
-from .models import TrainingProgram, TrainingRecord
+from .models import TrainingRecord, PositionTrainingRequirement
 
 @admin.register(TrainingRecord)
 class TrainingRecordAdmin(admin.ModelAdmin):
-    list_display = ("employee", "program", "training_date", "expiry_date", "is_expired")
-    list_filter = ("program", "is_planned")
-    search_fields = ("employee__last_name", "certificate_number")
-    autocomplete_fields = ("employee", "program")
+    list_display = ("employee", "category", "provider", "training_date", "expiry_date", "is_expired", "is_archived")
+    list_filter = ("category", "provider", "is_archived")
+    search_fields = ("employee__last_name", "certificate")
+    autocomplete_fields = ("employee",)
 
-    def is_expired(self, obj):
-        return obj.is_expired
-    is_expired.boolean = True
-    is_expired.short_description = "Просрочено"
+@admin.register(PositionTrainingRequirement)
+class PositionTrainingRequirementAdmin(admin.ModelAdmin):
+    list_display = ("position", "category")
+    list_filter = ("category",)
+    autocomplete_fields = ("position",)

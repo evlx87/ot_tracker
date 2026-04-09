@@ -1,42 +1,47 @@
+{% load training_tags %}
 <table class="table table-striped table-bordered">
   <thead>
-    <tr>
-      <th>ФИО</th>
-      <th>Должность</th>
-      {% for prog in programs %}
-        <th>{{ prog.code }}<br><small>{{ prog.name }}</small></th>
-      {% endfor %}
-      <th>Ответственность</th>
-    </tr>
+  <tr>
+    <th>ФИО</th>
+    <th>Должность</th>
+    {% for prog in programs %}
+    <th>{{ prog.code }}<br><small>{{ prog.name }}</small></th>
+    {% endfor %}
+    <th>Ответственность</th>
+  </tr>
   </thead>
   <tbody>
-    {% for emp in employees %}
-    <tr>
-      <td>{{ emp.last_name }} {{ emp.first_name|slice:1 }}.</td>
-      <td>{{ emp.position.name }}</td>
-      {% for prog in programs %}
-        <td class="text-center">
-          {% with rec=matrix|get_item:emp.id|get_item:prog.code %}
-            {% if rec %}
-              {% if rec.is_expired %}<span class="badge bg-danger">Просрочено</span>
-              {% elif rec.expires_soon %}<span class="badge bg-warning">Скоро</span>
-              {% else %}<span class="badge bg-success">{{ rec.training_date|date:"d.m.Y" }}</span>
-              {% endif %}
-            {% else %}<span class="badge bg-secondary">Не обучен</span>
-            {% endif %}
-          {% endwith %}
-        </td>
-      {% endfor %}
-      <td>
-        {% for resp in emp.responsibilities.all %}
-          {% if resp.is_active %}
-            <span class="badge bg-info">{{ resp.get_type_display }}</span>
-          {% endif %}
-        {% empty %}
-          -
-        {% endfor %}
-      </td>
-    </tr>
+  {% for emp in employees %}
+  <tr>
+    <td>{{ emp.last_name }} {{ emp.first_name|slice:1 }}.</td>
+    <td>{{ emp.position.name }}</td>
+    {% for prog in programs %}
+    <td class="text-center">
+      {% with rec=matrix|get_item:emp.id|get_item:prog.code %}
+      {% if rec %}
+      {% if rec.is_expired %}
+      <span class="badge bg-danger">Просрочено</span>
+      {% elif rec.expires_soon %}
+      <span class="badge bg-warning text-dark">Скоро ({{ rec.expiry_date|date:"d.m.Y" }})</span>
+      {% else %}
+      <span class="badge bg-success">{{ rec.training_date|date:"d.m.Y" }}</span>
+      {% endif %}
+      {% else %}
+      <span class="badge bg-secondary">Не обучен</span>
+      {% endif %}
+      {% endwith %}
+    </td>
     {% endfor %}
+    <td>
+      {% for resp in emp.responsibilities.all %}
+      {% if resp.is_active %}
+      <span class="badge bg-info">{{ resp.get_type_display }}</span>
+      {% endif %}
+      {% empty %}
+      -
+      {% endfor %}
+    </td>
+  </tr>
+  {% endfor %}
   </tbody>
 </table>
